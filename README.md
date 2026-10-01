@@ -1,142 +1,123 @@
-# @vitejs/plugin-react [![npm](https://img.shields.io/npm/v/@vitejs/plugin-react.svg)](https://npmjs.com/package/@vitejs/plugin-react)
+# Geofencing & Location Event Detection System
 
-The default Vite plugin for React projects.
+FastAPI + SQLAlchemy backend and React + TypeScript + Material UI + Leaflet frontend for creating geofences and detecting enter, exit, inside, and outside events from device coordinates.
 
-- enable [Fast Refresh](https://www.npmjs.com/package/react-refresh) in development (requires react >= 16.9)
-- use the [automatic JSX runtime](https://legacy.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html)
-- use custom Babel plugins/presets
-- small installation size
+## Features
 
-```js
-// vite.config.js
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+- Circular and polygon geofence management.
+- Lightweight HMAC bearer-token login under distinct `/identity/*` routes.
+- Full user/device list, detail, and update APIs.
+- Coordinate validation with Pydantic.
+- GPS accuracy buffer support.
+- Duplicate enter/exit prevention by comparing each device's previous geofence state.
+- Multiple geofence evaluation for every location ingest.
+- Event history with previous and current state.
+- Audit trail and database health endpoints.
+- Distinct React operations console with sidebar navigation, dashboard metrics, live map, geofence/device/location/event tables, and location intake forms.
+- Interactive OpenStreetMap display for geofences, latest locations, and events.
+- MySQL, Alembic, Swagger/OpenAPI, Postman collection, Docker, and unit tests.
 
-export default defineConfig({
-  plugins: [react()],
-})
+## Run With Docker
+
+```bash
+docker compose up --build
 ```
 
-## Options
+- Backend: http://localhost:8000
+- Swagger docs: http://localhost:8000/docs
+- Frontend: http://localhost:5173
+- MySQL: localhost:3306, database `geofence`, user `geofence`, password `geofence`
 
-### include/exclude
+## Run Backend Locally
 
-Includes `.js`, `.jsx`, `.ts` & `.tsx` by default. This option can be used to add fast refresh to `.mdx` files:
-
-```js
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import mdx from '@mdx-js/rollup'
-
-export default defineConfig({
-  plugins: [
-    { enforce: 'pre', ...mdx() },
-    react({ include: /\.(mdx|js|jsx|ts|tsx)$/ }),
-  ],
-})
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
+alembic upgrade head
+uvicorn app.main:app --reload
 ```
 
-> `node_modules` are never processed by this plugin (but esbuild will)
+For fast local testing without MySQL, leave `GEOFENCE_DATABASE_URL` unset. The app defaults to SQLite.
 
-### jsxImportSource
+## Run Frontend Locally
 
-Control where the JSX factory is imported from. Default to `'react'`
-
-```js
-react({ jsxImportSource: '@emotion/react' })
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-### jsxRuntime
+## API Examples
 
-By default, the plugin uses the [automatic JSX runtime](https://legacy.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html). However, if you encounter any issues, you may opt out using the `jsxRuntime` option.
+Create an administrator and token:
 
-```js
-react({ jsxRuntime: 'classic' })
+```bash
+curl -X POST http://localhost:8000/api/v1/identity/signup ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"Admin\",\"email\":\"admin@example.com\",\"password\":\"secret123\"}"
 ```
 
-### babel
+Create a circular geofence:
 
-The `babel` option lets you add plugins, presets, and [other configuration](https://babeljs.io/docs/en/options) to the Babel transformation performed on each included file.
-
-```js
-react({
-  babel: {
-    presets: [...],
-    // Your plugins run before any built-in transform (eg: Fast Refresh)
-    plugins: [...],
-    // Use .babelrc files
-    babelrc: true,
-    // Use babel.config.js files
-    configFile: true,
-  }
-})
+```bash
+curl -X POST http://localhost:8000/api/v1/geofences ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"HQ\",\"boundary_type\":\"circle\",\"center_lat\":12.9716,\"center_lng\":77.5946,\"radius_meters\":500,\"accuracy_buffer_meters\":15}"
 ```
 
-Note: When not using plugins, only esbuild is used for production builds, resulting in faster builds.
+Ingest a location:
 
-#### Proposed syntax
-
-If you are using ES syntax that are still in proposal status (e.g. class properties), you can selectively enable them with the `babel.parserOpts.plugins` option:
-
-```js
-react({
-  babel: {
-    parserOpts: {
-      plugins: ['decorators-legacy'],
-    },
-  },
-})
+```bash
+curl -X POST http://localhost:8000/api/v1/locations ^
+  -H "Content-Type: application/json" ^
+  -d "{\"device_identifier\":\"device-001\",\"latitude\":12.9716,\"longitude\":77.5946,\"accuracy_meters\":10,\"timestamp\":\"2026-10-01T10:00:00Z\"}"
 ```
 
-This option does not enable _code transformation_. That is handled by esbuild.
+Alternative tracking endpoint:
 
-**Note:** TypeScript syntax is handled automatically.
-
-Here's the [complete list of Babel parser plugins](https://babeljs.io/docs/en/babel-parser#ecmascript-proposalshttpsgithubcombabelproposals).
-
-### reactRefreshHost
-
-The `reactRefreshHost` option is only necessary in a module federation context. It enables HMR to work between a remote & host application. In your remote Vite config, you would add your host origin:
-
-```js
-react({ reactRefreshHost: 'http://localhost:3000' })
+```bash
+curl -X POST http://localhost:8000/api/v1/track-points ^
+  -H "Content-Type: application/json" ^
+  -d "{\"device_identifier\":\"device-001\",\"latitude\":12.9000,\"longitude\":77.5000,\"accuracy_meters\":10,\"timestamp\":\"2026-10-01T10:05:00Z\"}"
 ```
 
-Under the hood, this simply updates the React Fash Refresh runtime URL from `/@react-refresh` to `http://localhost:3000/@react-refresh` to ensure there is only one Refresh runtime across the whole application. Note that if you define `base` option in the host application, you need to include it in the option, like: `http://localhost:3000/{base}`.
+## Tests
 
-## Middleware mode
-
-In [middleware mode](https://vite.dev/config/server-options.html#server-middlewaremode), you should make sure your entry `index.html` file is transformed by Vite. Here's an example for an Express server:
-
-```js
-app.get('/', async (req, res, next) => {
-  try {
-    let html = fs.readFileSync(path.resolve(root, 'index.html'), 'utf-8')
-
-    // Transform HTML using Vite plugins.
-    html = await viteServer.transformIndexHtml(req.url, html)
-
-    res.send(html)
-  } catch (e) {
-    return next(e)
-  }
-})
+```bash
+cd backend
+pytest
 ```
 
-Otherwise, you'll probably get this error:
+The tests cover haversine distance, circular boundary buffering, polygon inclusion, polygon boundary buffering, and event state transitions.
 
+## Project Structure
+
+```text
+backend/
+  app/
+    api/          FastAPI routers
+    core/         Settings
+    db/           SQLAlchemy session
+    models/       SQLAlchemy tables
+    schemas/      Pydantic contracts
+    services/     Geospatial and event detection engine
+  alembic/        Database migrations
+  tests/          Unit tests
+frontend/
+  src/
+    components/   Leaflet map
+    services/     Axios API client
+    types/        TypeScript API types
+postman/
+  geofence-system.postman_collection.json
 ```
-Uncaught Error: @vitejs/plugin-react can't detect preamble. Something is wrong.
-```
 
-### disableOxcRecommendation
+## Notes
 
-If set, disables the recommendation to use `@vitejs/plugin-react-oxc` (which is shown when `rolldown-vite` is detected and `babel` is not configured).
-
-## Consistent components exports
-
-For React refresh to work correctly, your file should only export React components. You can find a good explanation in the [Gatsby docs](https://www.gatsbyjs.com/docs/reference/local-development/fast-refresh/#how-it-works).
-
-If an incompatible change in exports is found, the module will be invalidated and HMR will propagate. To make it easier to export simple constants alongside your component, the module is only invalidated when their value changes.
-
-You can catch mistakes and get more detailed warning with this [eslint rule](https://github.com/ArnaudBarre/eslint-plugin-react-refresh).
+- In production, add authentication/authorization for administrator endpoints.
+- This implementation intentionally does not mirror the referenced screenshots exactly. It provides similar backend and frontend capability with different endpoint names, navigation labels, visual system, product identity, and page composition.
+- For very large fleets, add spatial indexes or a geospatial database extension and evaluate only nearby geofences.
+- The current event engine intentionally emits repeat `inside` events when enabled, while suppressing duplicate enter/exit events unless the state actually changes.

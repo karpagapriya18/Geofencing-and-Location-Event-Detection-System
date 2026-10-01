@@ -30,7 +30,7 @@ def create_tables_for_local_dev() -> None:
 
 @app.get("/health", tags=["system"])
 def health() -> dict[str, str]:
-    return {"status": "ok", "service": "geo-sentinel", "mode": "field-monitoring"}
+    return {"status": "ok", "service": "geofencing-location-events", "mode": "event-detection"}
 
 
 @app.get("/api/v1/status", tags=["system"])

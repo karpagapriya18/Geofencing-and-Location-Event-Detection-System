@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "GeoSentinel Field API"
+    app_name: str = "Geofencing Location Event API"
     database_url: str = "sqlite:///./geofence.db"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     gps_accuracy_buffer_meters: float = 15.0

@@ -36,13 +36,13 @@ const samplePolygon = "12.965,77.585\n12.965,77.605\n12.981,77.605\n12.981,77.58
 type Section = "overview" | "map" | "boundaries" | "devices" | "locations" | "events" | "audit";
 
 const navItems: { id: Section; label: string; icon: ReactElement }[] = [
-  { id: "overview", label: "Summary", icon: <RadarIcon fontSize="small" /> },
-  { id: "map", label: "Field Map", icon: <MapIcon fontSize="small" /> },
-  { id: "boundaries", label: "Zones", icon: <FenceIcon fontSize="small" /> },
-  { id: "devices", label: "Units", icon: <DevicesIcon fontSize="small" /> },
-  { id: "locations", label: "Trail Log", icon: <HistoryIcon fontSize="small" /> },
-  { id: "events", label: "Alerts", icon: <TimelineIcon fontSize="small" /> },
-  { id: "audit", label: "Activity", icon: <ArticleIcon fontSize="small" /> }
+  { id: "overview", label: "Dashboard", icon: <RadarIcon fontSize="small" /> },
+  { id: "map", label: "Live Map", icon: <MapIcon fontSize="small" /> },
+  { id: "boundaries", label: "Geofences", icon: <FenceIcon fontSize="small" /> },
+  { id: "devices", label: "Devices", icon: <DevicesIcon fontSize="small" /> },
+  { id: "locations", label: "Location History", icon: <HistoryIcon fontSize="small" /> },
+  { id: "events", label: "Events", icon: <TimelineIcon fontSize="small" /> },
+  { id: "audit", label: "Audit Logs", icon: <ArticleIcon fontSize="small" /> }
 ];
 
 export default function App() {
@@ -152,7 +152,7 @@ export default function App() {
               .map(([latitude, longitude]) => ({ latitude, longitude }))
           };
     await createGeofence(payload);
-    setMessage("Zone saved.");
+    setMessage("Geofence saved.");
     await refresh();
   }
 
@@ -166,7 +166,7 @@ export default function App() {
       accuracy_meters: Number(formData.get("accuracy_meters") || 0),
       timestamp: new Date().toISOString()
     });
-    setMessage("Signal processed.");
+    setMessage("Location processed.");
     await refresh();
   }
 
@@ -206,11 +206,11 @@ export default function App() {
       <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "#d8e1ea" }}>
         <Stack component="form" onSubmit={submitGeofence} spacing={1.5}>
           <Typography variant="h6" color="#172033">
-            Zone Composer
+            Geofence Builder
           </Typography>
           <Grid container spacing={1.5}>
             <Grid item xs={12} sm={6}>
-              <TextField name="name" label="Zone name" size="small" defaultValue="North Field Zone" required fullWidth />
+              <TextField name="name" label="Geofence name" size="small" defaultValue="Office Circle Geofence" required fullWidth />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField select label="Shape" size="small" value={boundaryType} onChange={(e) => setBoundaryType(e.target.value as BoundaryType)} fullWidth>
@@ -240,7 +240,7 @@ export default function App() {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button type="submit" startIcon={<FenceIcon />} variant="contained" fullWidth sx={{ height: 40, bgcolor: "#155e75" }}>
-                Save Zone
+                Save Geofence
               </Button>
             </Grid>
           </Grid>
@@ -254,11 +254,11 @@ export default function App() {
       <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "#d8e1ea" }}>
         <Stack component="form" onSubmit={submitLocation} spacing={1.5}>
           <Typography variant="h6" color="#172033">
-            Signal Intake
+            Location Intake
           </Typography>
           <Grid container spacing={1.5}>
             <Grid item xs={12} sm={6}>
-              <TextField name="device_identifier" label="Unit code" size="small" defaultValue="unit-001" required fullWidth />
+              <TextField name="device_identifier" label="Device code" size="small" defaultValue="device-001" required fullWidth />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField name="accuracy_meters" label="Accuracy m" size="small" defaultValue="10" type="number" fullWidth />
@@ -271,7 +271,7 @@ export default function App() {
             </Grid>
             <Grid item xs={12}>
               <Button type="submit" startIcon={<AddLocationAltIcon />} variant="contained" fullWidth sx={{ bgcolor: "#a16207" }}>
-                Process Signal
+                Process Location
               </Button>
             </Grid>
           </Grid>
@@ -297,9 +297,9 @@ export default function App() {
               <ExploreIcon sx={{ color: "#a16207", fontSize: 34 }} />
               <Box>
                 <Typography variant="h4" fontWeight={800} color="#102a2f">
-                  GeoSentinel
+                  Geofence Event Monitor
                 </Typography>
-                <Typography color="text.secondary">Sign in to open the field console.</Typography>
+                <Typography color="text.secondary">Sign in to open the geofencing console.</Typography>
               </Box>
             </Stack>
             {authError && <Alert severity="error">{authError}</Alert>}
@@ -330,9 +330,9 @@ export default function App() {
           <Stack direction="row" spacing={1.5} alignItems="center">
             <ExploreIcon sx={{ color: "#facc15" }} />
             <Box>
-              <Typography fontWeight={800}>GeoSentinel</Typography>
+              <Typography fontWeight={800}>Geofence Event Monitor</Typography>
               <Typography variant="caption" sx={{ color: "#b9c6d4" }}>
-                Field signal console
+                Geofencing control console
               </Typography>
             </Box>
           </Stack>
@@ -361,10 +361,10 @@ export default function App() {
           <Stack direction="row" justifyContent="space-between" alignItems="center" gap={2}>
             <Box>
               <Typography variant="h5" fontWeight={800} color="#172033">
-                Field Monitoring
+                Geofence Monitoring
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Compact console for zone state detection and live signals.
+                Compact console for geofence state detection and live signals.
               </Typography>
             </Box>
             <Stack direction="row" spacing={1} alignItems="center">
@@ -396,13 +396,13 @@ export default function App() {
             <Stack spacing={2}>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={3}>
-                  <StatTile label="Live zones" value={activeFences} helper={`${geofences.length} total configured`} tone="#155e75" />
+                  <StatTile label="Active geofences" value={activeFences} helper={`${geofences.length} total configured`} tone="#155e75" />
                 </Grid>
                 <Grid item xs={12} md={3}>
-                  <StatTile label="Units seen" value={latestLocations.length} helper="latest known unit positions" tone="#a16207" />
+                  <StatTile label="Devices seen" value={latestLocations.length} helper="latest known device positions" tone="#a16207" />
                 </Grid>
                 <Grid item xs={12} md={3}>
-                  <StatTile label="Alerts" value={events.length} helper="recent state transitions" tone="#2563eb" />
+                  <StatTile label="Events" value={events.length} helper="recent location events" tone="#2563eb" />
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <StatTile label="Inside now" value={events.filter((e) => e.current_state === "inside").length} helper="based on event stream" tone="#f59e0b" />
@@ -419,7 +419,7 @@ export default function App() {
                     <LocationForm />
                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: "#d8e1ea" }}>
                       <Typography variant="h6" color="#172033">
-                        Alert Mix
+                        Event Mix
                       </Typography>
                       <Stack direction="row" spacing={1} sx={{ my: 1 }} flexWrap="wrap">
                         {["enter", "exit", "inside", "outside"].map((type) => (
@@ -429,7 +429,7 @@ export default function App() {
                       <Divider sx={{ my: 1 }} />
                       {events.slice(0, 5).map((event) => (
                         <Typography key={event.id} variant="body2" sx={{ py: 0.6 }}>
-                          {event.event_type.toUpperCase()} zone {event.geofence_id} by unit {event.device_id}
+                          {event.event_type.toUpperCase()} geofence {event.geofence_id} by Device {event.device_id}
                         </Typography>
                       ))}
                     </Paper>
@@ -462,7 +462,7 @@ export default function App() {
                 <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 820 }}>
                   <thead>
                     <tr>
-                      {["Zone", "Shape", "Geometry", "Rules", "Enabled"].map((head) => (
+                      {["Geofence", "Shape", "Geometry", "Rules", "Enabled"].map((head) => (
                         <Box component="th" key={head} sx={{ textAlign: "left", p: 1.5, bgcolor: "#f8fafc", color: "#475569" }}>
                           {head}
                         </Box>
@@ -475,7 +475,7 @@ export default function App() {
                         <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0", fontWeight: 700 }}>
                           {fence.name}
                           <Typography variant="caption" display="block" color="text.secondary">
-                            Zone #{fence.id}
+                            Geofence #{fence.id}
                           </Typography>
                         </Box>
                         <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>
@@ -507,7 +507,7 @@ export default function App() {
               <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
                 <thead>
                   <tr>
-                    {["Unit", "Last latitude", "Last longitude", "Accuracy", "Recorded"].map((head) => (
+                    {["Device", "Last latitude", "Last longitude", "Accuracy", "Recorded"].map((head) => (
                       <Box component="th" key={head} sx={{ textAlign: "left", p: 1.5, bgcolor: "#f8fafc", color: "#475569" }}>
                         {head}
                       </Box>
@@ -518,7 +518,7 @@ export default function App() {
                   {latestLocations.map((location) => (
                     <tr key={location.device_id}>
                       <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0", fontWeight: 700 }}>
-                        Unit {location.device_id}
+                        Device {location.device_id}
                       </Box>
                       <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>{location.latitude.toFixed(5)}</Box>
                       <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>{location.longitude.toFixed(5)}</Box>
@@ -538,7 +538,7 @@ export default function App() {
                 <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
                   <thead>
                     <tr>
-                      {["Unit", "Coordinates", "Accuracy", "Timestamp", "Status"].map((head) => (
+                      {["Device", "Coordinates", "Accuracy", "Timestamp", "Status"].map((head) => (
                         <Box component="th" key={head} sx={{ textAlign: "left", p: 1.5, bgcolor: "#f8fafc", color: "#475569" }}>
                           {head}
                         </Box>
@@ -548,7 +548,7 @@ export default function App() {
                   <tbody>
                     {locations.slice(0, 80).map((location) => (
                       <tr key={location.id}>
-                        <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>Unit {location.device_id}</Box>
+                        <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>Device {location.device_id}</Box>
                         <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>
                           {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
                         </Box>
@@ -570,7 +570,7 @@ export default function App() {
               <Box component="table" sx={{ width: "100%", borderCollapse: "collapse", minWidth: 860 }}>
                 <thead>
                   <tr>
-                    {["Alert", "Unit", "Zone", "State", "Location", "When"].map((head) => (
+                    {["Event", "Device", "Geofence", "State", "Location", "When"].map((head) => (
                       <Box component="th" key={head} sx={{ textAlign: "left", p: 1.5, bgcolor: "#f8fafc", color: "#475569" }}>
                         {head}
                       </Box>
@@ -583,8 +583,8 @@ export default function App() {
                       <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>
                         <Chip label={event.event_type} size="small" color={event.event_type === "exit" ? "error" : event.event_type === "enter" ? "success" : "info"} />
                       </Box>
-                      <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>Unit {event.device_id}</Box>
-                      <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>Zone {event.geofence_id}</Box>
+                      <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>Device {event.device_id}</Box>
+                      <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>Geofence {event.geofence_id}</Box>
                       <Box component="td" sx={{ p: 1.5, borderTop: "1px solid #e2e8f0" }}>
                         {event.previous_state ?? "new"} to {event.current_state}
                       </Box>
@@ -602,7 +602,7 @@ export default function App() {
           {section === "audit" && (
             <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, borderColor: "#d8e1ea" }}>
               <Typography variant="h6" color="#172033">
-                Activity Log
+                Audit Logs
               </Typography>
               <Typography color="text.secondary" sx={{ mt: 1 }}>
                 The backend exposes `/api/v1/audit-trail` and `/api/v1/health/database`. This panel is intentionally separate from the reference design and can be connected to the audit endpoint for production review.
