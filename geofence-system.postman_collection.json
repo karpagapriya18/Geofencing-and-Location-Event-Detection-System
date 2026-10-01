@@ -1,0 +1,140 @@
+{
+  "info": {
+    "name": "Geofence Event Detection System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api/v1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Identity Signup",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/identity/signup",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Admin\",\"email\":\"admin@example.com\",\"password\":\"secret123\"}"
+        }
+      }
+    },
+    {
+      "name": "Identity Token",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/identity/token",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"admin@example.com\",\"password\":\"secret123\"}"
+        }
+      }
+    },
+    {
+      "name": "Create Circle Geofence",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/geofences",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"HQ Circle\",\"boundary_type\":\"circle\",\"center_lat\":12.9716,\"center_lng\":77.5946,\"radius_meters\":500,\"accuracy_buffer_meters\":15,\"emit_inside_events\":true,\"emit_outside_events\":false}"
+        }
+      }
+    },
+    {
+      "name": "Create Polygon Geofence",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/geofences",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Polygon Zone\",\"boundary_type\":\"polygon\",\"accuracy_buffer_meters\":15,\"points\":[{\"latitude\":12.965,\"longitude\":77.585},{\"latitude\":12.965,\"longitude\":77.605},{\"latitude\":12.981,\"longitude\":77.605},{\"latitude\":12.981,\"longitude\":77.585}]}"
+        }
+      }
+    },
+    {
+      "name": "List Geofences",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/geofences"
+      }
+    },
+    {
+      "name": "Ingest Location Inside",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/locations",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"device_identifier\":\"device-001\",\"latitude\":12.9716,\"longitude\":77.5946,\"accuracy_meters\":10,\"timestamp\":\"2026-10-01T10:00:00Z\"}"
+        }
+      }
+    },
+    {
+      "name": "Ingest Location Outside",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/locations",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"device_identifier\":\"device-001\",\"latitude\":12.9000,\"longitude\":77.5000,\"accuracy_meters\":10,\"timestamp\":\"2026-10-01T10:05:00Z\"}"
+        }
+      }
+    },
+    {
+      "name": "Track Point Alias",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/track-points",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"device_identifier\":\"device-001\",\"latitude\":12.9000,\"longitude\":77.5000,\"accuracy_meters\":10,\"timestamp\":\"2026-10-01T10:05:00Z\"}"
+        }
+      }
+    },
+    {
+      "name": "List Events",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/events"
+      }
+    },
+    {
+      "name": "Boundary Events",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/boundary-events"
+      }
+    },
+    {
+      "name": "Audit Trail",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/audit-trail"
+      }
+    },
+    {
+      "name": "Database Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health/database"
+      }
+    },
+    {
+      "name": "Location History",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/locations/history"
+      }
+    }
+  ]
+}
